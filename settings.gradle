@@ -1,0 +1,3 @@
+include ':takephoto'
+include ':app'
+rootProject.name = "UTakePhoto"
