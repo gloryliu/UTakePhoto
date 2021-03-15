@@ -14,7 +14,9 @@ import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import com.lzr.takephoto.BuildConfig
 import com.lzr.takephoto.utils.PermissionUtils
+import com.lzr.takephoto.utils.TConstant
 import com.lzr.takephoto.utils.TUriParse
 import java.io.File
 import java.io.FileInputStream
@@ -47,16 +49,6 @@ class TakePhotoManager(
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
     )
-
-    /**
-     * 拍照ResultCode
-     */
-    private val TAKE_PHOTO_RESULT = 1 shl 2
-
-    /**
-     * 选择相册ResultCode
-     */
-    private val DIRECTORY_PICTURES_RESULT = 1 shl 3
 
     /**
      * 裁剪ResultCode
@@ -194,7 +186,7 @@ class TakePhotoManager(
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(takePictureIntent, TAKE_PHOTO_RESULT)
+                    startActivityForResult(takePictureIntent, TConstant.RC_PICK_PICTURE_FROM_CAPTURE)
                 }
             }
         }
@@ -214,33 +206,11 @@ class TakePhotoManager(
         }
     }
 
-    @Throws(IOException::class)
-    private fun copyImageFile(sourceFile:File) {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        File.createTempFile(
-            "JPEG_${timeStamp}_",
-            ".jpg",
-            storageDir
-        ).apply {
 
-            var inPut:FileInputStream? = null
-            var outPut:FileOutputStream? = null
-            try {
-                 inPut = FileInputStream(sourceFile)
-                outPut = FileOutputStream(this)
-                outPut?.channel.transferFrom(inPut?.channel, 0, inPut?.channel.size())
-                currentPhotoPath = absolutePath
-            } finally {
-                inPut?.close()
-                outPut?.close()
-            }
-        }
-    }
     private fun goAlbum() {
         Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI).also { album ->
             album.setType("image/*")
-            startActivityForResult(album, DIRECTORY_PICTURES_RESULT)
+            startActivityForResult(album, TConstant.RC_PICK_PICTURE_FROM_GALLERY_ORIGINAL)
         }
     }
 
@@ -265,28 +235,15 @@ class TakePhotoManager(
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode) {
-            TAKE_PHOTO_RESULT -> {
+            TConstant.RC_PICK_PICTURE_FROM_CAPTURE -> {
                 if (resultCode == RESULT_OK) {
                     resultCallback?.takeSuccess(currentPhotoPath)
                 } else {
                     resultCallback?.takeCancel()
                 }
             }
-            DIRECTORY_PICTURES_RESULT -> {
+            TConstant.RC_PICK_PICTURE_FROM_GALLERY_ORIGINAL -> {
                 if (resultCode == RESULT_OK) {
-//                    data?.data?.let {
-//                        mContext.contentResolver.query(it,null,null,null,null)?.let { cursor ->
-//                            if (cursor.moveToFirst()) {
-//                                currentPhotoPath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-//                            }
-//                        }
-//                    }
-//                    try {
-//                        copyImageFile(File(currentPhotoPath))
-//                        resultCallback?.takeSuccess(currentPhotoPath)
-//                    } catch (ex:Exception) {
-//                        ex.printStackTrace()
-//                    }
                     currentPhotoPath = TUriParse.getFilePathWithUri(data?.data, mContext)
                     resultCallback?.takeSuccess(currentPhotoPath)
                 } else {
