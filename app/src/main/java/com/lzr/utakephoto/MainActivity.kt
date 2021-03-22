@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         imageCamera = findViewById(R.id.imageCamera)
 
         button1.setOnClickListener {
-            UTakePhoto.with(this).openCamera().request(object : TakePhotoResult{
+            UTakePhoto.with(this).openCamera().crop().request(object : TakePhotoResult{
                 override fun takeSuccess(filePath: String) {
                     var bitmap = BitmapFactory.decodeFile(filePath)
                     imageCamera.setImageBitmap(bitmap)
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         button2.setOnClickListener {
-            UTakePhoto.with(this).openAlbum().request(object : TakePhotoResult{
+            UTakePhoto.with(this).openAlbum().crop().request(object : TakePhotoResult{
                 override fun takeSuccess(filePath: String) {
                     var bitmap = BitmapFactory.decodeFile(filePath)
                     image.setImageBitmap(bitmap)
