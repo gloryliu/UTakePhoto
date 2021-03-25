@@ -20,6 +20,8 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Handler;
@@ -51,6 +53,15 @@ class CropUtil {
         } catch (Throwable t) {
             // Do nothing
         }
+    }
+
+    public static Bitmap rotateImage(Bitmap img, int rotate) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotate);
+        int width = img.getWidth();
+        int height = img.getHeight();
+        img = Bitmap.createBitmap(img, 0, 0, width, height, matrix, false);
+        return img;
     }
 
     public static int getExifRotation(File imageFile) {

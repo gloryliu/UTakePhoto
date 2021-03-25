@@ -78,10 +78,30 @@ class TakePhotoManager(
         lifecycle.addListener(this)
     }
 
+    enum class Mode{
+        CAMERA,
+        ALBUM
+    }
+
+    /**
+     * 获取图片
+     */
+    fun photo(mode:Mode):TakePhotoManager {
+        when(mode) {
+            Mode.CAMERA -> {
+                this.takeType = TConstant.TYPE_TAKE_PHOTO
+            }
+            Mode.ALBUM -> {
+                this.takeType = TConstant.TYPE_SELECT_IMAGE
+            }
+        }
+        return this
+    }
+
     /**
      * 打开相机
      */
-    fun openCamera():TakePhotoManager {
+    private fun openCamera():TakePhotoManager {
         this.takeType = TConstant.TYPE_TAKE_PHOTO
         return this
     }
@@ -89,7 +109,7 @@ class TakePhotoManager(
     /**
      * 打开相册
      */
-    fun openAlbum():TakePhotoManager {
+    private fun openAlbum():TakePhotoManager {
         this.takeType = TConstant.TYPE_SELECT_IMAGE
         return this
     }

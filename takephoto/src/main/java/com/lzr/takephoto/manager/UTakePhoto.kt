@@ -1,8 +1,12 @@
 package com.lzr.takephoto.manager
 
 import android.app.Activity
+import android.view.View
+import androidx.annotation.IntDef
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 
 /**
  * @author liuzhenrong
@@ -14,15 +18,17 @@ class UTakePhoto {
     private var fragemt:android.app.Fragment? = null
     private var suppertFragment:Fragment? = null
 
-    constructor(fragemt:android.app.Fragment) {
+    constructor(fragemt: android.app.Fragment) {
         this.fragemt = fragemt
     }
 
-    constructor(suppertFragment:Fragment) {
+    constructor(suppertFragment: Fragment) {
         this.suppertFragment = suppertFragment
     }
 
+
     companion object {
+
         fun with(activity: FragmentActivity):TakePhotoManager {
             return RequestManagerRetriever.get(activity)
         }

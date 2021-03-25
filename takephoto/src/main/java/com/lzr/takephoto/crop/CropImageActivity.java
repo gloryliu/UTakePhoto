@@ -33,9 +33,11 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.lzr.takephoto.R;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,7 +95,7 @@ public class CropImageActivity extends MonitoredActivity {
     }
 
     private void setupViews() {
-        setContentView(R.layout.crop__activity_crop);
+        setContentView(R.layout.takephoto_crop__activity_crop);
 
         imageView = (CropImageView) findViewById(R.id.crop_image);
         imageView.context = this;
@@ -195,7 +197,7 @@ public class CropImageActivity extends MonitoredActivity {
             return;
         }
         imageView.setImageRotateBitmapResetBase(rotateBitmap, true);
-        CropUtil.startBackgroundJob(this, null, getResources().getString(R.string.crop__wait),
+        CropUtil.startBackgroundJob(this, null, getResources().getString(R.string.takephoto_crop__wait),
                 new Runnable() {
                     public void run() {
                         final CountDownLatch latch = new CountDownLatch(1);
@@ -291,6 +293,11 @@ public class CropImageActivity extends MonitoredActivity {
         }
 
         try {
+            if(exifRotation != 0 && exifRotation % 90 == 0){
+                int tmp = outWidth;
+                outWidth = outHeight;
+                outHeight = tmp;
+            }
             croppedImage = decodeRegionCrop(r, outWidth, outHeight);
         } catch (IllegalArgumentException e) {
             setResultException(e);
@@ -309,7 +316,7 @@ public class CropImageActivity extends MonitoredActivity {
     private void saveImage(Bitmap croppedImage) {
         if (croppedImage != null) {
             final Bitmap b = croppedImage;
-            CropUtil.startBackgroundJob(this, null, getResources().getString(R.string.crop__saving),
+            CropUtil.startBackgroundJob(this, null, getResources().getString(R.string.takephoto_crop__saving),
                     new Runnable() {
                         public void run() {
                             saveOutput(b);
@@ -379,7 +386,7 @@ public class CropImageActivity extends MonitoredActivity {
         System.gc();
     }
 
-    private void saveOutput(Bitmap croppedImage) {
+    private void saveOutputBug(Bitmap croppedImage) {
         if (saveUri != null) {
             OutputStream outputStream = null;
             try {
@@ -393,6 +400,49 @@ public class CropImageActivity extends MonitoredActivity {
                 setResultException(e);
                 Log.e("Cannot open file: " + saveUri, e);
             } finally {
+                CropUtil.closeSilently(outputStream);
+            }
+
+            CropUtil.copyExifRotation(
+                    CropUtil.getFromMediaUri(this, getContentResolver(), sourceUri),
+                    CropUtil.getFromMediaUri(this, getContentResolver(), saveUri)
+            );
+
+            setResultUri(saveUri);
+        }
+
+        final Bitmap b = croppedImage;
+        handler.post(new Runnable() {
+            public void run() {
+                imageView.clear();
+                b.recycle();
+            }
+        });
+
+        finish();
+    }
+
+    private void saveOutput(Bitmap croppedImage) {
+        if (saveUri != null) {
+            OutputStream outputStream = null;
+            Bitmap destBitmap = croppedImage;
+            if(exifRotation != 0){
+                destBitmap = CropUtil.rotateImage(croppedImage, exifRotation);
+            }
+            try {
+                //save bitmap to file
+                outputStream = getContentResolver().openOutputStream(saveUri);
+                if (outputStream != null) {
+                    destBitmap.compress(saveAsPng ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
+                            90,     // note: quality is ignored when using PNG
+                            outputStream);
+                }
+                destBitmap.recycle();
+            } catch (OutOfMemoryError error) {
+            } catch (IOException e){
+                setResultException(e);
+                Log.e("Cannot open file: " + saveUri, e);
+            }finally {
                 CropUtil.closeSilently(outputStream);
             }
 

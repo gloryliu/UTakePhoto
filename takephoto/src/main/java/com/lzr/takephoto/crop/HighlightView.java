@@ -86,14 +86,14 @@ class HighlightView {
 
     private void initStyles(Context context) {
         TypedValue outValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.cropImageStyle, outValue, true);
-        TypedArray attributes = context.obtainStyledAttributes(outValue.resourceId, R.styleable.CropImageView);
+        context.getTheme().resolveAttribute(R.attr.takephotocropImageStyle, outValue, true);
+        TypedArray attributes = context.obtainStyledAttributes(outValue.resourceId, R.styleable.TakephotoCropImageView);
         try {
-            showThirds = attributes.getBoolean(R.styleable.CropImageView_showThirds, false);
-            showCircle = attributes.getBoolean(R.styleable.CropImageView_showCircle, false);
-            highlightColor = attributes.getColor(R.styleable.CropImageView_highlightColor,
+            showThirds = attributes.getBoolean(R.styleable.TakephotoCropImageView_showThirds, false);
+            showCircle = attributes.getBoolean(R.styleable.TakephotoCropImageView_showCircle, false);
+            highlightColor = attributes.getColor(R.styleable.TakephotoCropImageView_highlightColor,
                     DEFAULT_HIGHLIGHT_COLOR);
-            handleMode = HandleMode.values()[attributes.getInt(R.styleable.CropImageView_showHandles, 0)];
+            handleMode = HandleMode.values()[attributes.getInt(R.styleable.TakephotoCropImageView_showHandles, 0)];
         } finally {
             attributes.recycle();
         }

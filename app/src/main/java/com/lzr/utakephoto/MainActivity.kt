@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import com.lzr.takephoto.manager.TakePhotoManager
 import com.lzr.takephoto.manager.TakePhotoResult
 import com.lzr.takephoto.manager.UTakePhoto
 
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         imageCamera = findViewById(R.id.imageCamera)
 
         button1.setOnClickListener {
-            UTakePhoto.with(this).openCamera().crop().request(object : TakePhotoResult{
+            UTakePhoto.with(this).photo(TakePhotoManager.Mode.CAMERA).crop().request(object : TakePhotoResult{
                 override fun takeSuccess(filePath: String) {
                     var bitmap = BitmapFactory.decodeFile(filePath)
                     imageCamera.setImageBitmap(bitmap)
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         button2.setOnClickListener {
-            UTakePhoto.with(this).openAlbum().crop().request(object : TakePhotoResult{
+            UTakePhoto.with(this).photo(TakePhotoManager.Mode.ALBUM).crop().request(object : TakePhotoResult{
                 override fun takeSuccess(filePath: String) {
                     var bitmap = BitmapFactory.decodeFile(filePath)
                     image.setImageBitmap(bitmap)
