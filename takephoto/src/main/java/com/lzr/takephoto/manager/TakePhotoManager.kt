@@ -286,7 +286,7 @@ class TakePhotoManager(
                     it
             )
             if (uTakePhoto.getFragment() != null) {
-                Crop.of(source, cropOutPhotoUri).asSquare().start(uTakePhoto.getFragment()?.context, uTakePhoto.getFragment())
+                Crop.of(source, cropOutPhotoUri).asSquare().start(uTakePhoto.getFragment()?.activity, uTakePhoto.getFragment())
             } else if (uTakePhoto.getSupportFragment() != null) {
                 Crop.of(source, cropOutPhotoUri).asSquare().start(uTakePhoto.getSupportFragment()?.context, uTakePhoto.getSupportFragment())
             }

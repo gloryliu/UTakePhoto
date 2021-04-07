@@ -152,9 +152,10 @@ class CropUtil {
                 }else{
                     String[] proj = {MediaStore.Images.Media.DATA};
                     cursor = resolver.query(uri, proj, null, null, null);
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor.moveToFirst();
-                    filePath = cursor.getString(column_index);
+                    if (cursor!=null && cursor.moveToFirst()) {
+                        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                        filePath = cursor.getString(column_index);
+                    }
                 }
                 if (!TextUtils.isEmpty(filePath)) {
                     return new File(filePath);

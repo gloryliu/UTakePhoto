@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
@@ -183,7 +184,12 @@ public class CropImageView extends ImageViewTouchBase {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
+        try {
+            super.onDraw(canvas);
+        }catch (Exception e) {
+            Log.d("takephoto","onDraw() Canvas: trying to use a recycled bitmap");
+            e.printStackTrace();
+        }
         for (HighlightView highlightView : highlightViews) {
             highlightView.draw(canvas);
         }

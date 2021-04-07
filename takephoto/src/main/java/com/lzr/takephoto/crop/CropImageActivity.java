@@ -19,9 +19,12 @@ package com.lzr.takephoto.crop;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Movie;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
@@ -336,6 +339,18 @@ public class CropImageActivity extends MonitoredActivity {
         Bitmap croppedImage = null;
         try {
             is = getContentResolver().openInputStream(sourceUri);
+            String mimeType = getContentResolver().getType(sourceUri);
+            if ("image/gif".equals(mimeType)) {
+                Movie gif = Movie.decodeStream(is);
+                Bitmap firstFrame = Bitmap.createBitmap(rect.width(), rect.height(), Config.ARGB_4444);
+                Canvas canvas = new Canvas(firstFrame);
+                gif.draw(canvas, 0, 0);
+                canvas.save();
+                croppedImage = firstFrame;
+                CropUtil.closeSilently(is);
+                return croppedImage;
+            }
+
             BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(is, false);
             final int width = decoder.getWidth();
             final int height = decoder.getHeight();
